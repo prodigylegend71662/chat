@@ -74,5 +74,15 @@
 - The new router uses `requests` directly rather than the OpenAI Python package.
 - If every provider is down, the app now sends a safe fallback message instead of crashing.
 
+## Deployment update (Render / Python 3.14)
+- Replaced `eventlet` with `gevent` across the app startup path:
+  - `app.py` now uses `gevent.monkey.patch_all()`.
+  - `extensions.py` now sets `SocketIO(async_mode="gevent")`.
+  - `db_fallback.py` now uses `gevent.sleep()` in the periodic reconnect loop instead of `eventlet.sleep()`.
+- Updated `requirements.txt` to install `gevent==24.2.1` and removed `eventlet`.
+- Updated `render.yaml` to use `gunicorn --worker-class gevent -w 1 --bind 0.0.0.0:$PORT app:app`.
+- Updated the service docs in `README.md` to show the gevent worker configuration.
+- Verified `chat/chat_app/static/style.css` is present and non-empty in this workspace, so the Render zero-byte CSS issue does not appear to be currently reproducible here.
+
 ## Needs manual review
 - `ai_router.py` depends on the external free providers remaining online and responsive. If one of the upstream provider endpoints changes, the router should be updated to match the new endpoint or body schema.
