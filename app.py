@@ -306,7 +306,7 @@ def create_app():
 
     @app.before_request
     def enforce_csrf_for_non_socket_requests():
-        if request.path.startswith("/socket.io"):
+        if request.path.startswith("/socket.io") or request.path.startswith("socket.io"):
             return
         if request.method in app.config["WTF_CSRF_METHODS"] and request.endpoint:
             csrf.protect()

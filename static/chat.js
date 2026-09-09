@@ -217,7 +217,7 @@
   window.addEventListener('focus',()=>{focused=true;unread=0;document.title='C.S.P. Chat'});window.addEventListener('blur',()=>focused=false);
 
   // Socket.IO connection lifecycle.
-  socket = io({transports:['polling','websocket'], upgrade: true, rememberUpgrade: true, auth:{csrf_token:csrf}});
+  socket = io({transports:['polling','websocket'], upgrade: true, rememberUpgrade: true, path:'/socket.io/', auth:{csrf_token:csrf}});
   socket.on('connect',()=>{connection.textContent='Connected';connection.className='connection connected';updateHealth();if(currentRoom)socket.emit('join_room',{room:currentRoom,csrf_token:csrf});});
   socket.on('disconnect',()=>{connection.textContent='Reconnecting…';connection.className='connection connecting';});
   socket.on('connect_error',()=>{connection.textContent='Reconnecting…';connection.className='connection connecting';});
