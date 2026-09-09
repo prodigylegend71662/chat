@@ -6,6 +6,6 @@ from flask_wtf import CSRFProtect
 
 
 db = SQLAlchemy()
-socketio = SocketIO(cors_allowed_origins="*", async_mode="threading")
+socketio = SocketIO(cors_allowed_origins="*", async_mode="threading", ping_timeout=60, ping_interval=25)
 login_manager = LoginManager()
 csrf = CSRFProtect()

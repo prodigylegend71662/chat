@@ -39,7 +39,7 @@ MAX_MESSAGE_LENGTH = 1000
 MESSAGE_INTERVAL = 0.5
 EDIT_INTERVAL = 5.0
 TYPING_INTERVAL = 2.0
-SESSION_TIMEOUT = 30 * 60
+SESSION_TIMEOUT = 7 * 24 * 60 * 60
 STATUS_IDLE = 5 * 60
 AVATARS = ["😀", "😎", "🤓", "🦊", "🐼", "🐸", "🐧", "🐨", "🐯", "🦁", "🐻", "🐰", "🐱", "🐶", "🐵", "🦄", "🐙", "🦋", "🐝", "🐢", "🌟", "⭐", "🚀", "🎮", "💻", "🔭", "🎨", "🎵", "📚", "🛠️", "❤️", "💙", "💚", "💜", "🧡", "🩵", "🌈", "🍀", "🌻", "🍎", "🍕", "☕", "⚡", "🔥", "❄️", "🌙", "☀️", "🤖", "👾"]
 COLORS = ["#4f8cff", "#8b5cf6", "#14b8a6", "#f59e0b", "#ef4444", "#ec4899", "#22c55e", "#06b6d4"]
@@ -285,10 +285,11 @@ def create_app():
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     # Security extensions and login management.
+    app.config["WTF_CSRF_CHECK_DEFAULT"] = False
     csrf.init_app(app)
     login_manager.init_app(app)
     login_manager.login_view = "login"
-    socketio.init_app(app, cors_allowed_origins=None, manage_session=True, logger=False, engineio_logger=False)
+    socketio.init_app(app, cors_allowed_origins="*", manage_session=True, logger=False, engineio_logger=False, ping_timeout=60, ping_interval=25)
 
     init_db_with_fallback(app, db, socketio)
     ensure_defaults(app)
@@ -302,6 +303,13 @@ def create_app():
     @app.before_request
     def prepare_request():
         g.csp_nonce = secrets.token_urlsafe(18)
+
+    @app.before_request
+    def enforce_csrf_for_non_socket_requests():
+        if request.path.startswith("/socket.io"):
+            return
+        if request.method in app.config["WTF_CSRF_METHODS"] and request.endpoint:
+            csrf.protect()
 
     @app.before_request
     def enforce_session_timeout():
@@ -354,7 +362,7 @@ def create_app():
             if not user or user.banned or not check_password_hash(user.password_hash, form.password.data):
                 error = "Invalid username or password"
             else:
-                login_user(user, remember=False, duration=timedelta(minutes=30))
+                login_user(user, remember=False, duration=timedelta(days=7))
                 session.permanent = True
                 session["last_activity_mono"] = time.monotonic()
                 user.last_active = utcnow()
@@ -362,7 +370,7 @@ def create_app():
                 db.session.commit()
                 return redirect(url_for("chat"))
         if request.args.get("expired"):
-            error = "Your session expired after 30 minutes of inactivity. Please log in again."
+            error = "Your session expired after 7 days of inactivity. Please log in again."
         return render_template("login.html", form=form, error=error)
 
     @app.route("/invite/<code>")
