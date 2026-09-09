@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}C.S.P. Chat{% endblock %}
+{% block content %}
+<div id="app" class="app-shell" data-me-id="{{ current_user.id }}" data-me-name="{{ current_user.username }}">
+  <aside class="sidebar">
+    <div class="profile-card"><span class="avatar">{{ current_user_public.avatar }}</span><div><strong>{{ current_user_public.display_name }}</strong><small>@{{ current_user_public.username }} · {{ current_user_public.role }}</small></div><button id="settings-open" class="icon-btn" title="Settings">⚙</button></div>
+    <div class="sidebar-section"><div class="section-head"><span>Rooms</span><button id="new-room" class="mini-btn">＋</button></div><div id="room-list" class="item-list"></div></div>
+    <div class="sidebar-section"><div class="section-head"><span>People</span></div><input id="user-search" class="mini-input" placeholder="Find a person…"><div id="user-list" class="item-list"></div></div>
+    <div class="sidebar-section"><div class="section-head"><span>Tools</span></div><button id="calendar-open" class="side-tool">📅 Global calendar</button><button id="invite-open" class="side-tool admin-only">🔐 Invite codes</button></div>
+  </aside>
+
+  <section class="chat-panel">
+    <div class="chat-header">
+      <div><h2 id="chat-title">general</h2><div id="typing-indicator" class="typing"></div></div>
+      <div class="header-tools"><span id="connection-status" class="connection connecting">Connecting…</span><input id="message-search" class="search-input" placeholder="Search this chat…"></div>
+    </div>
+    <div id="temporary-banner" class="warning-box hidden">Server is in temporary mode. Messages will be lost on restart.</div>
+    <div id="pinned-bar" class="pinned-bar hidden"></div>
+    <div id="search-results" class="search-results hidden"></div>
+    <div id="messages" class="messages" aria-live="polite"></div>
+    <button id="load-more" class="load-more hidden">Load more</button>
+    <div id="reply-preview" class="reply-preview hidden"></div>
+    <div id="mention-menu" class="mention-menu hidden"></div>
+    <div class="composer-wrap">
+      <textarea id="message-input" maxlength="1000" rows="1" placeholder="Write a message… Enter to send, Shift+Enter for a new line"></textarea>
+      <button id="send-btn" class="primary-btn">Send</button>
+    </div>
+  </section>
+</div>
+
+<div id="modal-backdrop" class="modal-backdrop hidden"><div id="modal" class="modal"></div></div>
+{% endblock %}
+<script nonce="{{ g.csp_nonce }}">window.__CSP_ROOMS__={{ rooms|map(attribute="id")|list|tojson }}.map((id,i)=>({id:id,name:{{ rooms|map(attribute="name")|list|tojson }}[i],default:{{ rooms|map(attribute="is_default")|list|tojson }}[i],created_by:{{ rooms|map(attribute="created_by")|list|tojson }}[i]}));window.__CSP_USERS__={{ users|map(attribute="id")|list|tojson }}.map((id,i)=>{const names={{ users|map(attribute="username")|list|tojson }};const u=names[i];return {id:id,username:u,display_name:u,avatar:"😀",status:"offline",role:"member"};});window.__CSP_ME__={{ current_user_public|tojson }};window.__CSP_SETTINGS__={{ {"theme": settings.theme if settings else "dark", "notify_mentions": settings.notify_mentions if settings else true, "notify_dms": settings.notify_dms if settings else true, "notify_room": settings.notify_room if settings else true, "profanity_filter": settings.profanity_filter if settings else true}|tojson }};window.__CSP_AVATARS__={{ avatars|tojson }};</script><script src="https://cdn.socket.io/4.7.5/socket.io.min.js" defer></script><script src="{{ url_for('static', filename='chat.js') }}" defer></script>

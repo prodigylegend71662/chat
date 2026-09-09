@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Create account — C.S.P.{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-card wide">
+    <div class="auth-logo">C</div>
+    <h1>Create your C.S.P. account</h1>
+    <p class="muted">Pick an avatar and join the support community.</p>
+    {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <input type="hidden" name="invite" value="{{ invite }}">
+      <label>Username{{ form.username(class_='field', autocomplete='username', minlength='3', maxlength='20') }}</label>
+      <label>Password{{ form.password(class_='field', autocomplete='new-password', minlength='8') }}</label>
+      <small class="muted">At least 8 characters, including a letter and a number.</small>
+      <label>Confirm password{{ form.confirm_password(class_='field', autocomplete='new-password') }}</label>
+      <div class="avatar-grid" aria-label="Choose an avatar">
+        {% for avatar in avatars %}<label class="avatar-option"><input type="radio" name="avatar" value="{{ avatar }}" {% if loop.first %}checked{% endif %}><span>{{ avatar }}</span></label>{% endfor %}
+      </div>
+      {{ form.submit(class_='primary-btn full') }}
+    </form>
+    <p class="auth-foot">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+  </div>
+</section>
+{% endblock %}

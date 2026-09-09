@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="description" content="C.S.P. — Common Support Program Chat">
+  <title>{% block title %}C.S.P. Chat{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">C</span><span>C.S.P.</span><small>Common Support Program</small></a>
+    {% if current_user.is_authenticated %}
+      <div class="top-actions">
+        <span id="db-status" class="status-badge">Checking DB…</span>
+        <button id="theme-toggle" class="icon-btn" type="button" title="Toggle theme">☾</button>
+        <a class="link-btn" href="{{ url_for('chat') }}">Chat</a>
+        <form method="post" action="{{ url_for('logout') }}" class="inline-form">
+          {{ csrf_token() }}
+          <button class="danger-link" type="submit">Log out</button>
+        </form>
+      </div>
+    {% endif %}
+  </header>
+  <main>{% block content %}{% endblock %}</main>
+  <div id="toast-region" aria-live="polite"></div>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

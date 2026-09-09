@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Log in — C.S.P.{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-logo">C</div>
+    <h1>Welcome to C.S.P.</h1>
+    <p class="muted">Common Support Program Chat</p>
+    {% if request.args.get('created') %}<div class="success-box">Account created. You can log in now.</div>{% endif %}
+    {% if error %}<div class="error-box">{{ error }}</div>{% endif %}
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <label>Username{{ form.username(class_='field', autocomplete='username', maxlength='20') }}</label>
+      {% for e in form.username.errors %}<small class="field-error">{{ e }}</small>{% endfor %}
+      <label>Password{{ form.password(class_='field', autocomplete='current-password') }}</label>
+      {% for e in form.password.errors %}<small class="field-error">{{ e }}</small>{% endfor %}
+      {{ form.submit(class_='primary-btn full') }}
+    </form>
+    <p class="auth-foot">New here? <a href="{{ url_for('signup') }}">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}
