@@ -11,9 +11,6 @@ import time
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 
-from gevent import monkey
-monkey.patch_all()
-
 import bleach
 from flask import Flask, g, jsonify, redirect, render_template, request, session, url_for
 from flask_login import current_user, login_required, login_user, logout_user

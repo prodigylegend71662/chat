@@ -120,10 +120,10 @@ def switch_to_next_database(app, db):
 
 def memory_reconnect_loop(app, db):
     """Try the durable backends periodically while temporary memory storage is active."""
-    from gevent import sleep
+    import time
 
     while True:
-        sleep(300)
+        time.sleep(300)
         if not USING_MEMORY:
             continue
         try:
